@@ -1,7 +1,5 @@
 import os
 
-import inquirer
-
 # Getting CWD
 dir = os.getcwd()
 
