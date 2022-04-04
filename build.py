@@ -1,41 +1,59 @@
 import os
+from ensurepip import version
+
+from yaml import YAMLError, safe_load
 
 # Getting CWD
 dir = os.getcwd()
 
 # Flutter Build apk command
-result = os.system('"flutter build apk --release"')
+result = 0
+# os.system('"flutter build apk --release"')
 
 # Appending CWD with release apk path
-dir = '{}\\build\\app\outputs\\flutter-apk\\app-release.apk'.format(dir)
-print(dir)
+apkPath = '{}\\build\\app\outputs\\flutter-apk\\app-release.apk'.format(dir)
+print(apkPath)
+
 
 # Check for [result] if it 0 then success
 if result == 0:
-    if not os.path.exists(dir):
+    currentAppName = ""
+    currentAppVersion = ""
+    if not os.path.exists(apkPath):
         print("File Does Not Exist")
     else:
+        # Getting App Name and App Version pubspec.yaml file from the current PWD path
+        yamlDir = "{}\\pubspec.yaml".format(dir)
+        with open(yamlDir, "r") as stream:
+            try:
+                data = safe_load(stream)
+                currentAppName = str(data['name']).upper()
+                currentAppVersion = str(data['version']).split("+")[0]
+                print("APP NAME: "+currentAppName)
+                print("APP VERSION: " + currentAppVersion)
+            except YAMLError as exc:
+                print(exc)
         print("""
 ------------------------------------------------------------------------------
-Format your flutter apk name from apk-release.apk to TEST_BUILT_TYPE_V1(1).apk
- TEST_BUILT_TYPE_V1(1).apk
+Format your flutter apk name from app-release.apk to {}_BUILT_TYPE_V{}(1).apk
  - Built Type -> TEST eg..
- - Appversion -> V1
- - App Version Code -> (1)
+ - App Build Number -> (1)
 ------------------------------------------------------------------------------
-        """)
-        appName = input("Enter App Name: ")
-        appVersion = input("Enter AppVersion: ")
-        appVersionNumber = input("Enter AppVersionNumber: ")
+        """.format(currentAppName, currentAppVersion))
         buildType = input("Enter Build Type: ")
-        list = dir.split('\\')
-        appname = list[len(list) - 1].split('.')
-        appname[0] = "{}_{}_V{}({})".format(appName, buildType, appVersion,
-                                            appVersionNumber)
-        newAppName = ".".join(appname)
+        buildNumber = input("Enter Build Number: ")
+        list = apkPath.split('\\')
+        #
+        # Split app-release.apk --> ['app-release','apk']
+        appName = list[len(list) - 1].split('.')
+        #
+        # Appending new name
+        appName[0] = "{}_{}_V{}({})".format(currentAppName, buildType.upper(), currentAppVersion,
+                                            buildNumber)
+        newAppName = ".".join(appName)
         list.remove('app-release.apk')
         list.append(newAppName)
         newAppPath = '\\'.join(list)
-        os.rename(dir, newAppPath)
+        os.rename(apkPath, newAppPath)
 else:
     print("Somthing went wrong")
