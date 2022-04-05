@@ -7,8 +7,7 @@ from yaml import YAMLError, safe_load
 dir = os.getcwd()
 
 # Flutter Build apk command
-result = 0
-# os.system('"flutter build apk --release"')
+result = os.system('"flutter build apk --release"')
 
 # Appending CWD with release apk path
 apkPath = '{}\\build\\app\outputs\\flutter-apk\\app-release.apk'.format(dir)
