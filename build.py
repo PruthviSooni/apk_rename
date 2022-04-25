@@ -1,5 +1,4 @@
 import os
-from ensurepip import version
 
 from yaml import YAMLError, safe_load
 
