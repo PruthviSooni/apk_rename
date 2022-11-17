@@ -1,17 +1,33 @@
 import os
 
+import inquirer
 from yaml import YAMLError, safe_load
 
 # Getting CWD
 dir = os.getcwd()
 
+# List For Storing SDK Path
+pathList = []
+
+# Getting Flutter SDK Path
+sdkPath = "C:\\FlutterSDK"
+
+# Adding Path to [pathList]
+for i in os.scandir(sdkPath):
+    pathList.append(i.name)
+
+# Prompt Selection for flutter version
+choiceList = [inquirer.List(
+    "path", message="Select Flutter version", choices=pathList), ]
+action = inquirer.prompt(choiceList)
+selectedVersion = action['path']
+
+
 # Flutter Build apk command
-result = os.system('"flutter build apk --release"')
+result = os.system('"{} build apk --release"'.format(selectedVersion))
 
 # Appending CWD with release apk path
 apkPath = '{}\\build\\app\outputs\\flutter-apk\\app-release.apk'.format(dir)
-print(apkPath)
-
 
 # Check for [result] if it 0 then success
 if result == 0:
@@ -54,4 +70,4 @@ Format your flutter apk name from app-release.apk to {}_BUILT_TYPE_V{}(1).apk
         newAppPath = '\\'.join(list)
         os.rename(apkPath, newAppPath)
 else:
-    print("Somthing went wrong")
+    print("Could Not Find Flutter Project")
